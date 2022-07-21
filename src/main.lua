@@ -13,8 +13,8 @@ require "read_memory" --memory functions
 --[[ GLOBALS ]]--
 
 BOT_PLAYER_NUM = 1
-NUM_INPUTS = 50 -- TODO
-NUM_OUTPUTS = 5 -- TODO
+NUM_INPUTS = 32 -- TODO
+NUM_OUTPUTS = 2 -- TODO
 
 --[[ END GLOBALS ]]--
 
@@ -64,9 +64,18 @@ do
     Board:update()
     Board:copy()
 
+    beginState = savestate.object(1)
+    savestate.save(beginState)
+
+    oneDBoard = {}
+
+
+
+
     --[[    MAIN LOOP   ]]--
     while true do
         Board:update()
+        oneDBoard = flattenTable(Board.raw)
         --handleBlockSet()
         emu.frameadvance()
     end

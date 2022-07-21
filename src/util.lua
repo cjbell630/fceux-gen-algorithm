@@ -147,3 +147,19 @@ function tableToInvertedDict(table)
     end
     return dict
 end
+
+-- TODO doc
+-- converts table to flattened table
+function flattenTable(table)
+    local flattened = {}
+    for _, v in ipairs(table) do
+        if type(v) == "table" then
+            for _, v2 in ipairs(flattenTable(v)) do
+                flattened[#flattened + 1] = v2
+            end
+        else
+            flattened[#flattened + 1] = v
+        end
+    end
+    return flattened
+end

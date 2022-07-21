@@ -96,7 +96,8 @@ function Genome:newConnectionMutation()
     repeat
         inputNode = math.random(-NUM_INPUTS, self.numHiddenNodes)
         outputNode = math.random(-NUM_OUTPUTS, self.numHiddenNodes)
-        if outputNode < 0 then -- if output node is an output, then shift it to the correct position
+        if outputNode < 0 then
+            -- if output node is an output, then shift it to the correct position
             outputNode = outputNode - NUM_INPUTS
         end
     until not self:connectionExists(inputNode, outputNode)
@@ -123,3 +124,85 @@ function Genome:weightChangeMutation()
 end
 
 --[[ END DEF Genome ]]--
+
+--[[ BEGIN DEF Species ]]--
+
+Species = {}
+Species.__index = Species
+
+function Species:new()
+    local species = {}
+    setmetatable(species, Species)
+    species.genomes = {}
+    species.staleness = 0
+    species.lastHighestFitness = 0
+    return species
+end
+
+function Species:averageFitness()
+    local sum = 0
+    for _, genome in ipairs(self.genomes) do
+        sum = sum + genome.fitness
+    end
+    return sum / #self.genomes
+end
+
+function Species:highestFitness()
+    local highest = 0
+    for _, genome in ipairs(self.genomes) do
+        if genome.fitness > highest then
+            highest = genome.fitness
+        end
+    end
+    return highest
+end
+
+--[[ END DEF Species ]]--
+
+--[[ BEGIN DEF Population ]]--
+
+Population = {}
+Population.__index = Population
+Population.EXPIRY = 100
+
+function Population:new()
+    local population = {}
+    setmetatable(population, Population)
+    population.speciesList = {}
+    -- TODO populate
+    population.generation = 0
+    return population
+end
+
+function Population:killStaleSpecies()
+    local killList = {}
+    for _, species in ipairs(self.speciesList) do
+        -- if species did not improve this generation
+        if species.lastHighestFitness >= species:highestFitness() then
+            species.staleness = species.staleness + 1
+        else
+            -- if species improved this generation
+            species.staleness = 0
+        end
+        species.lastHighestFitness = species:highestFitness()
+
+        if species.staleness >= Population.EXPIRY then
+            table.insert(killList, species)
+        end
+    end
+    for _, species in ipairs(killList) do
+        table.remove(self.speciesList, species)
+    end
+end
+
+function Population:newGeneration()
+    self.generation = self.generation + 1
+    -- TODO kill stale species
+    -- TODO kill weakest half of each species
+    -- TODO create certain number of children from each species (possibly crossover, then mutate)
+    -- TODO add children to species, creating new ones if necessary
+
+    --
+end
+
+--[[ END DEF Population ]]--
