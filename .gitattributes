@@ -1,0 +1,2 @@
+build/yoshi-nes-ai.lua linguist-generated
+build/scripts/*.lua linguist-vendored
